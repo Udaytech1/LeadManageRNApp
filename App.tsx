@@ -5,34 +5,182 @@
  * @format
  */
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, View, Text, Image } from 'react-native';
 import {
   SafeAreaProvider,
-  useSafeAreaInsets,
+  SafeAreaView,
 } from 'react-native-safe-area-context';
+import OCRScreen from './src/screens/orc_screen/OCRScreen';
+import ChatScreen from './src/screens/chat_screen/ChatScreen';
+import LeadDetailsScreen from './src/screens/lead_detail_screen/LeadDetailsScreen';
+import FullScreenNotification from './src/screens/full_screen_notification/FullScreenNotification';
+import LocationMapScreen from './src/screens/location_map_screen/LocationMapScreen';
+import LeadDashboardScreen from './src/screens/lead_dashboard_screen/LeadDashboardScreen';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useState } from 'react';
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
+function MainTabs({ triggerNotification, notification, handleAccept, handleReject, declinedLeads }) {
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
+    <Tab.Navigator
+      screenOptions={{
+        tabBarActiveTintColor: '#2e8b57',
+        tabBarInactiveTintColor: '#888',
+      }}
+    >
+      <Tab.Screen
+        name="OCR"
+        component={OCRScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+<Image
+  source={require('./assets/icons/credit_score.png')}
+  style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
+/>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+<Image
+  source={require('./assets/icons/chat_icon.png')}
+  style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
+/>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="LocationMap"
+        component={LocationMapScreen}
+        options={{
+          title: 'Location',
+          tabBarIcon: ({ color, size }) => (
+<Image
+  source={require('./assets/icons/location_icon.png')}
+  style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
+/>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="LeadDashboard"
+        component={LeadDashboardScreen}
+        options={{
+          title: 'Dashboard',
+          tabBarIcon: ({ color, size }) => (
+<Image
+  source={require('./assets/icons/dashboard_icon.png')}
+  style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
+/>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Notification"
+        children={() => (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Tap below to simulate notification</Text>
+            <Text
+              style={{
+                margin: 16,
+                padding: 12,
+                backgroundColor: '#2e8b57',
+                color: '#fff',
+                borderRadius: 8,
+                textAlign: 'center',
+              }}
+              onPress={triggerNotification}
+            >
+              Simulate Notification
+            </Text>
+            {notification && (
+              <FullScreenNotification
+                lead={notification}
+                onAccept={handleAccept}
+                onReject={handleReject}
+              />
+            )}
+            {declinedLeads.length > 0 && (
+              <View style={{ padding: 12 }}>
+                <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>Declined Leads:</Text>
+                {declinedLeads.map((lead, idx) => (
+                  <Text key={idx}>{lead.name} ({lead.location})</Text>
+                ))}
+              </View>
+            )}
+          </View>
+        )}
+        options={{
+          title: 'Notification',
+          tabBarIcon: ({ color, size }) => (
+<Image
+  source={require('./assets/icons/notification_icon.png')}
+  style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
+/>
+          ),
+        }}
+      />
+    </Tab.Navigator>
   );
 }
 
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
+function MainScreens({ navigation }) {
+  const [notification, setNotification] = useState(null);
+  const [declinedLeads, setDeclinedLeads] = useState([]);
+
+  // Simulate push notification
+  const mockLead = {
+    name: 'Priya Sharma',
+    location: 'Pune',
+    matchScore: 88,
+  };
+
+  const triggerNotification = () => {
+    setNotification(mockLead);
+  };
+
+  const handleAccept = () => {
+    setNotification(null);
+    navigation.navigate('LeadDetails', { lead: notification });
+  };
+
+  const handleReject = () => {
+    setDeclinedLeads(prev => [...prev, notification]);
+    setNotification(null);
+  };
 
   return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
+    <SafeAreaView style={styles.container} edges={['left', 'right']}>
+      <MainTabs
+        triggerNotification={triggerNotification}
+        notification={notification}
+        handleAccept={handleAccept}
+        handleReject={handleReject}
+        declinedLeads={declinedLeads}
       />
-    </View>
+    </SafeAreaView>
+  );
+}
+
+function App() {
+  const isDarkMode = useColorScheme() === 'dark';
+  return (
+    <SafeAreaProvider>
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Main" component={MainScreens} />
+          <Stack.Screen name="LeadDetails" component={LeadDetailsScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
 
