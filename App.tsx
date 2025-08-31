@@ -5,6 +5,7 @@
  * @format
  */
 
+import React, { useState } from 'react';
 import { StatusBar, StyleSheet, useColorScheme, View, Text, Image } from 'react-native';
 import {
   SafeAreaProvider,
@@ -17,14 +18,34 @@ import FullScreenNotification from './src/screens/full_screen_notification/FullS
 import LocationMapScreen from './src/screens/location_map_screen/LocationMapScreen';
 import LeadDashboardScreen from './src/screens/lead_dashboard_screen/LeadDashboardScreen';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useState } from 'react';
+
+// Types for lead and notification
+type Lead = {
+  name: string;
+  location: string;
+  matchScore: number;
+};
+
+type MainTabsProps = {
+  triggerNotification: () => void;
+  notification: Lead | null;
+  handleAccept: () => void;
+  handleReject: () => void;
+  declinedLeads: Lead[];
+};
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MainTabs({ triggerNotification, notification, handleAccept, handleReject, declinedLeads }) {
+function MainTabs({
+  triggerNotification,
+  notification,
+  handleAccept,
+  handleReject,
+  declinedLeads,
+}: MainTabsProps) {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -36,11 +57,11 @@ function MainTabs({ triggerNotification, notification, handleAccept, handleRejec
         name="OCR"
         component={OCRScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
-<Image
-  source={require('./assets/icons/credit_score.png')}
-  style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
-/>
+          tabBarIcon: ({ color, size }: { color: string; size?: number }) => (
+            <Image
+              source={require('./assets/icons/credit_score.png')}
+              style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
+            />
           ),
         }}
       />
@@ -48,11 +69,11 @@ function MainTabs({ triggerNotification, notification, handleAccept, handleRejec
         name="Chat"
         component={ChatScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
-<Image
-  source={require('./assets/icons/chat_icon.png')}
-  style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
-/>
+          tabBarIcon: ({ color, size }: { color: string; size?: number }) => (
+            <Image
+              source={require('./assets/icons/chat_icon.png')}
+              style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
+            />
           ),
         }}
       />
@@ -61,11 +82,11 @@ function MainTabs({ triggerNotification, notification, handleAccept, handleRejec
         component={LocationMapScreen}
         options={{
           title: 'Location',
-          tabBarIcon: ({ color, size }) => (
-<Image
-  source={require('./assets/icons/location_icon.png')}
-  style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
-/>
+          tabBarIcon: ({ color, size }: { color: string; size?: number }) => (
+            <Image
+              source={require('./assets/icons/location_icon.png')}
+              style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
+            />
           ),
         }}
       />
@@ -74,11 +95,11 @@ function MainTabs({ triggerNotification, notification, handleAccept, handleRejec
         component={LeadDashboardScreen}
         options={{
           title: 'Dashboard',
-          tabBarIcon: ({ color, size }) => (
-<Image
-  source={require('./assets/icons/dashboard_icon.png')}
-  style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
-/>
+          tabBarIcon: ({ color, size }: { color: string; size?: number }) => (
+            <Image
+              source={require('./assets/icons/dashboard_icon.png')}
+              style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
+            />
           ),
         }}
       />
@@ -119,11 +140,11 @@ function MainTabs({ triggerNotification, notification, handleAccept, handleRejec
         )}
         options={{
           title: 'Notification',
-          tabBarIcon: ({ color, size }) => (
-<Image
-  source={require('./assets/icons/notification_icon.png')}
-  style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
-/>
+          tabBarIcon: ({ color, size }: { color: string; size?: number }) => (
+            <Image
+              source={require('./assets/icons/notification_icon.png')}
+              style={{ width: size ?? 24, height: size ?? 24, tintColor: color }}
+            />
           ),
         }}
       />
@@ -131,12 +152,17 @@ function MainTabs({ triggerNotification, notification, handleAccept, handleRejec
   );
 }
 
-function MainScreens({ navigation }) {
-  const [notification, setNotification] = useState(null);
-  const [declinedLeads, setDeclinedLeads] = useState([]);
+// Props for MainScreens
+type MainScreensProps = {
+  navigation: StackNavigationProp<any>;
+};
+
+function MainScreens({ navigation }: MainScreensProps) {
+  const [notification, setNotification] = useState<Lead | null>(null);
+  const [declinedLeads, setDeclinedLeads] = useState<Lead[]>([]);
 
   // Simulate push notification
-  const mockLead = {
+  const mockLead: Lead = {
     name: 'Priya Sharma',
     location: 'Pune',
     matchScore: 88,
@@ -152,7 +178,7 @@ function MainScreens({ navigation }) {
   };
 
   const handleReject = () => {
-    setDeclinedLeads(prev => [...prev, notification]);
+    setDeclinedLeads(prev => [...prev, notification!]);
     setNotification(null);
   };
 

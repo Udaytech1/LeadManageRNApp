@@ -1,18 +1,30 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Button, Platform } from 'react-native';
-import Geolocation from 'react-native-geolocation-service';
-import MapView, { Marker } from 'react-native-maps';
+import { View, Text, StyleSheet } from 'react-native';
+import Geolocation, { GeoCoordinates } from 'react-native-geolocation-service';
+import MapView, { Marker, Region } from 'react-native-maps';
+import { locationMapScreenStyles } from './locationMapScreen.style';
 
-const leads = [
-  { name: 'Alice Johnson', location: 'Mumbai', lat: 19.0760, lng: 72.8777 },
-  { name: 'Bob Singh', location: 'Delhi', lat: 28.6139, lng: 77.2090 },
+type Lead = {
+  name: string;
+  location: string;
+  lat: number;
+  lng: number;
+};
+
+const leads: Lead[] = [
+  { name: 'Alice Johnson', location: 'Mumbai', lat: 19.076, lng: 72.8777 },
+  { name: 'Bob Singh', location: 'Delhi', lat: 28.6139, lng: 77.209 },
   { name: 'Carol Verma', location: 'Bangalore', lat: 12.9716, lng: 77.5946 },
   { name: 'Priya Sharma', location: 'Pune', lat: 18.5204, lng: 73.8567 },
 ];
 
-function getDistance(lat1, lng1, lat2, lng2) {
-  // Haversine formula
-  const toRad = x => (x * Math.PI) / 180;
+function getDistance(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): number {
+  const toRad = (x: number) => (x * Math.PI) / 180;
   const R = 6371; // km
   const dLat = toRad(lat2 - lat1);
   const dLng = toRad(lng2 - lng1);
@@ -26,12 +38,12 @@ function getDistance(lat1, lng1, lat2, lng2) {
   return R * c;
 }
 
-export default function LocationMapScreen() {
-  const [location, setLocation] = useState(null);
-  const [nearestLead, setNearestLead] = useState(null);
-  const timerRef = useRef(null);
+const LocationMapScreen: React.FC = () => {
+  const [location, setLocation] = useState<GeoCoordinates | null>(null);
+  const [nearestLead, setNearestLead] = useState<Lead | null>(null);
+  const timerRef = useRef<any | null>(null);
 
-  const fetchLocation = () => {
+  const fetchLocation = (): void => {
     Geolocation.getCurrentPosition(
       pos => {
         setLocation(pos.coords);
@@ -43,22 +55,29 @@ export default function LocationMapScreen() {
         enableHighAccuracy: false,
         timeout: 15000,
         maximumAge: 10000,
-      }
+      },
     );
   };
 
   useEffect(() => {
     fetchLocation();
     timerRef.current = setInterval(fetchLocation, 120000); // every 2 min
-    return () => clearInterval(timerRef.current);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, []);
 
   useEffect(() => {
     if (location) {
       let minDist = Infinity;
-      let nearest = null;
+      let nearest: Lead | null = null;
       leads.forEach(lead => {
-        const dist = getDistance(location.latitude, location.longitude, lead.lat, lead.lng);
+        const dist = getDistance(
+          location.latitude,
+          location.longitude,
+          lead.lat,
+          lead.lng,
+        );
         if (dist < minDist) {
           minDist = dist;
           nearest = lead;
@@ -68,19 +87,22 @@ export default function LocationMapScreen() {
     }
   }, [location]);
 
+  const mapRegion: Region | undefined = location
+    ? {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        latitudeDelta: 0.2,
+        longitudeDelta: 0.2,
+      }
+    : undefined;
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Your Location & Nearest Lead</Text>
-      {location ? (
-        <MapView
-          style={styles.map}
-          region={{
-            latitude: location.latitude,
-            longitude: location.longitude,
-            latitudeDelta: 0.2,
-            longitudeDelta: 0.2,
-          }}
-        >
+    <View style={locationMapScreenStyles.container}>
+      <Text style={locationMapScreenStyles.title}>
+        Your Location & Nearest Lead
+      </Text>
+      {location && mapRegion ? (
+        <MapView style={locationMapScreenStyles.map} region={mapRegion}>
           <Marker
             coordinate={{
               latitude: location.latitude,
@@ -105,29 +127,18 @@ export default function LocationMapScreen() {
         <Text>Fetching location...</Text>
       )}
       {nearestLead && (
-        <View style={styles.leadCard}>
-          <Text style={styles.leadTitle}>Nearest Lead:</Text>
-          <Text style={styles.leadName}>{nearestLead.name}</Text>
-          <Text style={styles.leadLoc}>{nearestLead.location}</Text>
+        <View style={locationMapScreenStyles.leadCard}>
+          <Text style={locationMapScreenStyles.leadTitle}>Nearest Lead:</Text>
+          <Text style={locationMapScreenStyles.leadName}>
+            {nearestLead.name}
+          </Text>
+          <Text style={locationMapScreenStyles.leadLoc}>
+            {nearestLead.location}
+          </Text>
         </View>
       )}
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', paddingTop: 16 },
-  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 8, textAlign: 'center' },
-  map: { width: '100%', height: 350 },
-  leadCard: {
-    marginTop: 16,
-    padding: 16,
-    backgroundColor: '#e6ffe6',
-    borderRadius: 10,
-    alignItems: 'center',
-    marginHorizontal: 16,
-  },
-  leadTitle: { fontWeight: 'bold', fontSize: 16, marginBottom: 4 },
-  leadName: { fontSize: 18, fontWeight: 'bold' },
-  leadLoc: { fontSize: 16, color: '#555' },
-});
+export default LocationMapScreen;

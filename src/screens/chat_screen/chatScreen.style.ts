@@ -1,0 +1,56 @@
+import { StyleSheet } from "react-native";
+
+export const chatScreenStyles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f7f7f7' },
+  inputRow: {
+    flexDirection: 'row',
+    padding: 8,
+    borderTopWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#bbb',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    marginRight: 8,
+    backgroundColor: '#fff',
+  },
+  userMsg: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#d1e7dd',
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 8,
+    maxWidth: '80%',
+  },
+  userText: { color: '#222' },
+  botMsg: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 8,
+    maxWidth: '90%',
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  botText: { color: '#333', marginBottom: 6 },
+  leadCard: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    padding: 8,
+    marginVertical: 4,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  highlightCard: {
+    borderColor: '#2e8b57',
+    backgroundColor: '#e6ffe6',
+  },
+  leadName: { fontWeight: 'bold', fontSize: 16 },
+  leadLoc: { color: '#555', marginBottom: 2 },
+  leadScore: { color: '#2e8b57', fontWeight: 'bold' },
+});

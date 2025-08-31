@@ -1,23 +1,42 @@
 import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
+import { StackScreenProps } from '@react-navigation/stack';
+import { leadDetailScreenStyles } from './leadDetailScreen.style';
 
-export default function LeadDetailsScreen({ route, navigation }) {
+// Define Lead type
+type Lead = {
+  name: string;
+  location: string;
+  matchScore: number;
+};
+
+// Define navigation params for this screen
+type RootStackParamList = {
+  LeadDetails: { lead: Lead };
+};
+
+type Props = StackScreenProps<RootStackParamList, 'LeadDetails'>;
+
+const LeadDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { lead } = route.params;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Lead Details</Text>
-      <Text style={styles.label}>Name: <Text style={styles.value}>{lead.name}</Text></Text>
-      <Text style={styles.label}>Location: <Text style={styles.value}>{lead.location}</Text></Text>
-      <Text style={styles.label}>Match Score: <Text style={styles.value}>{lead.matchScore}%</Text></Text>
+    <View style={leadDetailScreenStyles.container}>
+      <Text style={leadDetailScreenStyles.title}>Lead Details</Text>
+      <Text style={leadDetailScreenStyles.label}>
+        Name: <Text style={leadDetailScreenStyles.value}>{lead.name}</Text>
+      </Text>
+      <Text style={leadDetailScreenStyles.label}>
+        Location:{' '}
+        <Text style={leadDetailScreenStyles.value}>{lead.location}</Text>
+      </Text>
+      <Text style={leadDetailScreenStyles.label}>
+        Match Score:{' '}
+        <Text style={leadDetailScreenStyles.value}>{lead.matchScore}%</Text>
+      </Text>
       <Button title="Back" onPress={() => navigation.goBack()} />
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 24 },
-  label: { fontSize: 18, marginBottom: 12 },
-  value: { fontWeight: 'bold' },
-});
+export default LeadDetailsScreen;
