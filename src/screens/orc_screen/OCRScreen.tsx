@@ -54,6 +54,14 @@ const OCRScreen: React.FC = () => {
     if (asset?.uri) {
       setImageUri(asset.uri);
       const textBlocks: string[] = await TextRecognition.recognize(asset.uri);
+      // Combine all text lines
+      const fullText = textBlocks.join(' ');
+
+      // Regex for common DOB formats (dd/mm/yyyy, dd-mm-yyyy, yyyy-mm-dd etc.)
+      const dobRegex =
+        /\b(\d{2}[\/\-]\d{2}[\/\-]\d{4}|\d{4}[\/\-]\d{2}[\/\-]\d{2})\b/;
+      const dobMatch = fullText.match(dobRegex);
+
       // Simple parsing logic (customize as needed)
       const mockConfidence = (): number => Math.floor(Math.random() * 40) + 60; // 60-100%
       setFields([
@@ -69,7 +77,7 @@ const OCRScreen: React.FC = () => {
         },
         {
           label: 'DOB',
-          value: textBlocks[2] || '',
+          value: dobMatch ? dobMatch[0] : '',
           confidence: mockConfidence(),
         },
       ]);
@@ -109,7 +117,9 @@ const OCRScreen: React.FC = () => {
         <Button title="Upload Image" onPress={() => handleImage(false)} />
       </View>
       {loading && <ActivityIndicator size="large" />}
-      {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
+      {imageUri && (
+        <Image source={{ uri: imageUri }} style={ocrScreenStyles.image} />
+      )}
       {fields.map((field, idx) => (
         <View key={field.label} style={ocrScreenStyles.fieldRow}>
           <Text style={ocrScreenStyles.label}>{field.label}:</Text>

@@ -12,9 +12,8 @@ type Lead = {
   matchScore: number;
   distance?: number;
 };
-
 const leads: Lead[] = [
-  { name: 'Alice Johnson', location: 'Mumbai', lat: 19.0760, lng: 72.8777, matchScore: 92 },
+  { name: 'Alice Johnson', location: 'Lucknow', lat: 26.8467, lng: 80.9462, matchScore: 92 },
   { name: 'Bob Singh', location: 'Delhi', lat: 28.6139, lng: 77.2090, matchScore: 78 },
   { name: 'Carol Verma', location: 'Bangalore', lat: 12.9716, lng: 77.5946, matchScore: 85 },
   { name: 'Priya Sharma', location: 'Pune', lat: 18.5204, lng: 73.8567, matchScore: 88 },
