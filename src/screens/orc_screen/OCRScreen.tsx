@@ -5,7 +5,6 @@ import {
   TextInput,
   Button,
   Image,
-  StyleSheet,
   ActivityIndicator,
 } from 'react-native';
 import {
@@ -54,15 +53,12 @@ const OCRScreen: React.FC = () => {
     if (asset?.uri) {
       setImageUri(asset.uri);
       const textBlocks: string[] = await TextRecognition.recognize(asset.uri);
-      // Combine all text lines
       const fullText = textBlocks.join(' ');
 
-      // Regex for common DOB formats (dd/mm/yyyy, dd-mm-yyyy, yyyy-mm-dd etc.)
       const dobRegex =
         /\b(\d{2}[\/\-]\d{2}[\/\-]\d{4}|\d{4}[\/\-]\d{2}[\/\-]\d{2})\b/;
       const dobMatch = fullText.match(dobRegex);
 
-      // Simple parsing logic (customize as needed)
       const mockConfidence = (): number => Math.floor(Math.random() * 40) + 60; // 60-100%
       setFields([
         {
@@ -98,7 +94,6 @@ const OCRScreen: React.FC = () => {
         fields,
         savedAt: new Date().toISOString(),
       };
-      // Save to local DB (append to 'ocr_records' array)
       const existing = await AsyncStorage.getItem('ocr_records');
       const records: OCRRecord[] = existing ? JSON.parse(existing) : [];
       records.push(data);

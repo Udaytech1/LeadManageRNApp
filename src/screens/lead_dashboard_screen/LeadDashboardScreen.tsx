@@ -3,7 +3,6 @@ import { View, Text, Button, StyleSheet, FlatList, TouchableOpacity, ListRenderI
 import Geolocation, { GeoCoordinates } from 'react-native-geolocation-service';
 import { leadDashBoardScreenStyles } from './leadDashboardScreen.style';
 
-// Lead type
 type Lead = {
   name: string;
   location: string;
@@ -66,7 +65,6 @@ const LeadDashboardScreen: React.FC = () => {
     setLeadList(leadsWithDist);
   }, [userLoc, sortBy, filterScore]);
 
-  // Best match: highest score, then closest
   const bestMatch: Lead | null =
     leadList.length > 0
       ? leadList.reduce((best, lead) =>

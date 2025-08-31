@@ -2,21 +2,18 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, FlatList, ListRenderItemInfo } from 'react-native';
 import { chatScreenStyles } from './chatScreen.style';
 
-// Lead type
 export type Lead = {
   name: string;
   location: string;
   matchScore: number;
 };
 
-// Message type
 type Message = {
   type: 'user' | 'bot';
   text: string;
   leads?: Lead[];
 };
 
-// Mock API returns Promise<Lead[]>
 const mockApi = async (query: string): Promise<Lead[]> => {
   await new Promise(res => setTimeout(res as any, 800));
   return [

@@ -2,14 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 import { fullScreenNotificationStyles } from './fullScreenNotification.style';
 
-// Define Lead type
 export type Lead = {
   name: string;
   location: string;
   matchScore: number;
 };
 
-// Props type for the component
 type FullScreenNotificationProps = {
   lead: Lead | null;
   onAccept: () => void;

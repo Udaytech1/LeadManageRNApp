@@ -61,7 +61,7 @@ const LocationMapScreen: React.FC = () => {
 
   useEffect(() => {
     fetchLocation();
-    timerRef.current = setInterval(fetchLocation, 120000); // every 2 min
+    timerRef.current = setInterval(fetchLocation, 120000); 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
